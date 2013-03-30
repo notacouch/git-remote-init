@@ -3,8 +3,13 @@ gitTop=$( git rev-parse --show-toplevel 2> /dev/null )
 [[ "" == "$gitTop" ]] && exit 0
 gitRemotes=$gitTop/.gitremotes
 [[ ! -e $gitRemotes ]] && exit 0
-[[ "$( git remote -v )" == "" ]] && exit 0
-remotes=$(sed '/origin/d' $gitRemotes | awk 'NR%2==0 {print $1";"$2 }')
+gitRemoteRepos=$( git remote )
+gitRemoteRepos=$( echo $gitRemoteRepos | sed -e 's/ /\|/g')
+if [ "$gitRemoteRepos" == "" ]; then
+        remotes=$( awk < .gitremotes 'NR%2==0 { print $1";"$2 }' )
+else
+        remotes=$( awk < .gitremotes "NR%2==0 {sub(/^($gitRemoteRepos).*\$/,\"\"); print \$1\";\"\$2 }" | sed '/^;/d' )
+fi
 for r in $remotes ; do
 	git remote add $(echo $r | sed 's/;/ /')
 done
