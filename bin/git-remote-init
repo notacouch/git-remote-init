@@ -6,9 +6,9 @@ gitRemotes=$gitTop/.gitremotes
 gitRemoteRepos=$( git remote )
 gitRemoteRepos=$( echo $gitRemoteRepos | sed -e 's/ /\|/g')
 if [ "$gitRemoteRepos" == "" ]; then
-        remotes=$( awk < .gitremotes 'NR%2==0 { print $1";"$2 }' )
+        remotes=$( awk < $gitRemotes 'NR%2==0 { print $1";"$2 }' )
 else
-        remotes=$( awk < .gitremotes "NR%2==0 {sub(/^($gitRemoteRepos).*\$/,\"\"); print \$1\";\"\$2 }" | sed '/^;/d' )
+        remotes=$( awk < $gitRemotes "NR%2==0 {sub(/^($gitRemoteRepos).*\$/,\"\"); print \$1\";\"\$2 }" | sed '/^;/d' )
 fi
 for r in $remotes ; do
 	git remote add $(echo $r | sed 's/;/ /')
